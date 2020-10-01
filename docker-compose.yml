@@ -1,0 +1,9 @@
+version: '3.3'
+services:
+  pcapngbucketizer:
+    build: .
+    volumes:
+    - /output/:/output/
+    command: /build/a.bin -i 127.0.0.1
+    network_mode: host
+
