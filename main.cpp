@@ -1,3 +1,4 @@
+#include "MetaInfo.h"
 #include <iostream>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
@@ -10,6 +11,7 @@ using namespace boost::program_options;
 std::string output = "output", file, interfaceIP, comment;
 
 size_t bucketTimeout = 60;
+
 class PcapFile
 {
 public:
@@ -24,7 +26,9 @@ public:
     {
         if(firstPacket)
         {
-            m_pcapNgWriter->writePacket(rawPacket,comment.c_str());
+            MetaInfo metaInfo("t1","t2","t3");
+            metaInfo.parseLayers(rawPacket);
+            m_pcapNgWriter->writePacket(rawPacket, metaInfo.toString().c_str());
             m_hashSet.insert(hash);
         }
         else
@@ -78,7 +82,7 @@ public:
     {
         pcpp::Packet parsedPacket(&rawPacket, false, pcpp::TCP | pcpp::UDP);
 
-        uint32_t hash = pcpp::hash5Tuple(&parsedPacket);
+        uint32_t hash = pcpp::hash5Tuple(&parsedPacket,true);
         HashMap::const_iterator itr = m_hashMap.find(hash);
         if(itr != m_hashMap.end())
         {
